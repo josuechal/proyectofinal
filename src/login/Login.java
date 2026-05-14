@@ -1,5 +1,5 @@
 package login;
-
+import javax.swing.*;
 import menu.MenuPrincipal;
 
 import conexion.ConexionBD;
@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
 
 public class Login extends JFrame {
 
@@ -94,13 +95,10 @@ public class Login extends JFrame {
 
             if(rs.next()) {
 
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Login correcto"
-                );
-                
-                new MenuPrincipal();
-                
+                String rol = rs.getString("rol");
+
+                new MenuPrincipal(rol);
+
                 dispose();
 
             } else {
@@ -109,7 +107,6 @@ public class Login extends JFrame {
                         null,
                         "Usuario incorrecto"
                 );
-
             }
 
         } catch (Exception e) {

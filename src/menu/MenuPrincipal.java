@@ -1,12 +1,16 @@
 package menu;
 import productos.ListaProductos;
+import login.Login;
+import usuario.ListaUsuario;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class MenuPrincipal extends JFrame {
 
-    public MenuPrincipal() {
+public class MenuPrincipal extends JFrame {
+	
+
+    public MenuPrincipal(String rol) {
 
         setTitle("Sistema de Inventario");
 
@@ -93,8 +97,15 @@ public class MenuPrincipal extends JFrame {
 
         btnUsuarios.setBounds(30,320,150,40);
 
-        menuLateral.add(btnUsuarios);
+        if(rol.equals("admin")) {
+            menuLateral.add(btnUsuarios);
+        }
+        btnUsuarios.addActionListener(e -> {
 
+            new ListaUsuario();
+
+        });
+        
         JButton btnCerrar =
                 new JButton("Cerrar sesión");
 
@@ -102,6 +113,24 @@ public class MenuPrincipal extends JFrame {
 
         menuLateral.add(btnCerrar);
 
+        btnCerrar.addActionListener(e -> {
+
+            int opcion = JOptionPane.showConfirmDialog(
+                    null,
+                    "¿Cerrar sesión?"
+            );
+
+            if(opcion == 0) {
+
+                new Login();
+
+                dispose();
+            }
+
+        });
+        
         setVisible(true);
     }
+    
+    
 }
