@@ -1,136 +1,375 @@
 package menu;
+
 import productos.ListaProductos;
-import login.Login;
 import usuario.ListaUsuario;
+import login.Login;
+import categorias.Categoria;
+import Proveedores.proveedores;
+import conexion.ConexionBD;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.swing.*;
 import java.awt.*;
 
-
 public class MenuPrincipal extends JFrame {
-	
+
+    private JPanel sidebar;
+    private JPanel topbar;
+    private JDesktopPane desktopPane;
+    private JPanel dashboard;
+    private JLabel lblProductos;
+    private JLabel lblClientes;
+    private JLabel lblVentas;
+    private JLabel lblStock;
+    private JLabel lblUsuarios;
+    private JLabel lblCategorias;
+    private JLabel lblProveedores;
+    private JLabel lblGanancias;
+    private String rol;
 
     public MenuPrincipal(String rol) {
+    	
+    	this.rol = rol;
 
         setTitle("Sistema de Inventario");
 
-        setSize(1000,600);
+        setSize(1200, 700);
 
         setLocationRelativeTo(null);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        setLayout(null);
+        setLayout(new BorderLayout());
 
-        getContentPane().setBackground(
-                new Color(35,35,35)
-        );
+        //---------------- TOPBAR ----------------
 
-        // TÍTULO
+        topbar = new JPanel();
 
-        JLabel titulo =
-                new JLabel("SISTEMA INVENTARIO");
+        topbar.setBackground(new Color(30,30,30));
+
+        topbar.setPreferredSize(new Dimension(1200,70));
+
+        topbar.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        JLabel titulo = new JLabel("SISTEMA DE INVENTARIO");
 
         titulo.setForeground(Color.WHITE);
 
-        titulo.setFont(
-                new Font("Arial",
-                        Font.BOLD,
-                        28)
-        );
+        titulo.setFont(new Font("Arial", Font.BOLD, 28));
 
-        titulo.setBounds(330,20,400,40);
+        topbar.add(titulo);
 
-        add(titulo);
+        add(topbar, BorderLayout.NORTH);
 
-        // PANEL LATERAL
+        //---------------- SIDEBAR ----------------
 
-        JPanel menuLateral =
-                new JPanel();
+        sidebar = new JPanel();
 
-        menuLateral.setLayout(null);
+        sidebar.setBackground(new Color(20,20,20));
 
-        menuLateral.setBackground(
-                new Color(25,25,25)
-        );
+        sidebar.setPreferredSize(new Dimension(220,700));
 
-        menuLateral.setBounds(0,0,220,600);
+        sidebar.setLayout(null);
 
-        add(menuLateral);
+        add(sidebar, BorderLayout.WEST);
 
-        // BOTONES
+        //---------------- DESKTOP ----------------
 
-        JButton btnProductos =
-                new JButton("Productos");
+        desktopPane = new JDesktopPane();
 
-        btnProductos.setBounds(30,80,150,40);
-        btnProductos.addActionListener(e -> {
+        desktopPane.setBackground(new Color(45,45,45));
 
-        	new ListaProductos();
-
-        });
-        menuLateral.add(btnProductos);
+        add(desktopPane, BorderLayout.CENTER);
         
-        JButton btnCategorias =
-                new JButton("Categorías");
+      //---------------- DASHBOARD ----------------
 
-        btnCategorias.setBounds(30,140,150,40);
+        dashboard = new JPanel();
 
-        menuLateral.add(btnCategorias);
+        dashboard.setLayout(new GridLayout(2, 4, 20, 20));
 
-        JButton btnEntradas =
-                new JButton("Entradas");
+        dashboard.setBackground(new Color(45,45,45));
 
-        btnEntradas.setBounds(30,200,150,40);
+        dashboard.setBounds(20,20,900,500);
 
-        menuLateral.add(btnEntradas);
+        lblProductos = crearCard(
+                "Productos",
+                "0",
+                new Color(52,152,219)
+        );
 
-        JButton btnSalidas =
-                new JButton("Salidas");
+        lblClientes = crearCard(
+                "Clientes",
+                "0",
+                new Color(46,204,113)
+        );
 
-        btnSalidas.setBounds(30,260,150,40);
+        lblVentas = crearCard(
+                "Ventas",
+                "S/ 0",
+                new Color(231,76,60)
+        );
 
-        menuLateral.add(btnSalidas);
+        lblStock = crearCard(
+                "Bajo Stock",
+                "0",
+                new Color(155,89,182)
+        );
 
-        JButton btnUsuarios =
-                new JButton("Usuarios");
+        lblUsuarios = crearCard(
+                "Usuarios",
+                "0",
+                new Color(241,196,15)
+        );
 
-        btnUsuarios.setBounds(30,320,150,40);
+        lblCategorias = crearCard(
+                "Categorías",
+                "0",
+                new Color(230,126,34)
+        );
+
+        lblProveedores = crearCard(
+                "Proveedores",
+                "0",
+                new Color(26,188,156)
+        );
+
+        lblGanancias = crearCard(
+                "Ganancias",
+                "S/ 0",
+                new Color(52,73,94)
+        );
+
+        desktopPane.add(dashboard);
+
+        //---------------- BOTONES ----------------
+
+        JButton btnProductos = crearBoton("Productos", 50);
+
+        btnProductos.addActionListener(e -> abrirProductos());
+
+        sidebar.add(btnProductos);
+
+        JButton btnCategorias = crearBoton("Categorías", 110);
+        btnCategorias.addActionListener(e -> abrirCategorias());
+        
+        sidebar.add(btnCategorias);
+
+        JButton btnProveedores = crearBoton("Proveedores", 170);
+
+        btnProveedores.addActionListener(e -> abrirProveedores());
+
+        sidebar.add(btnProveedores);
+        
+        JButton btnEntradas = crearBoton("Entradas", 230);
+
+        sidebar.add(btnEntradas);
+
+        JButton btnSalidas = crearBoton("Salidas", 290);
+
+        sidebar.add(btnSalidas);
 
         if(rol.equals("admin")) {
-            menuLateral.add(btnUsuarios);
+
+            JButton btnUsuarios = crearBoton("Usuarios", 350);
+
+            btnUsuarios.addActionListener(e -> abrirUsuarios());
+
+            sidebar.add(btnUsuarios);
         }
-        btnUsuarios.addActionListener(e -> {
 
-            new ListaUsuario();
+        JButton btnCerrar = crearBoton("Cerrar sesión", 520);
 
-        });
-        
-        JButton btnCerrar =
-                new JButton("Cerrar sesión");
+        btnCerrar.addActionListener(e -> cerrarSesion());
 
-        btnCerrar.setBounds(30,450,150,40);
+        sidebar.add(btnCerrar);
+       
+        cargarDashboard();
 
-        menuLateral.add(btnCerrar);
+        new Timer(3000, e -> cargarDashboard()).start();
 
-        btnCerrar.addActionListener(e -> {
-
-            int opcion = JOptionPane.showConfirmDialog(
-                    null,
-                    "¿Cerrar sesión?"
-            );
-
-            if(opcion == 0) {
-
-                new Login();
-
-                dispose();
-            }
-
-        });
-        
         setVisible(true);
     }
+    private void abrirCategorias() {
+        new Categoria();
+    }
     
+    private void abrirProveedores() {
+        new proveedores(rol);
+    }
     
+    //CARGAR DASHBOARD
+    public void cargarDashboard() {
+
+        Connection con = ConexionBD.conectar();
+
+        try {
+
+            // PRODUCTOS
+            String sqlProductos = "SELECT COUNT(*) AS total FROM productos";
+            PreparedStatement psProductos = con.prepareStatement(sqlProductos);
+            ResultSet rsProductos = psProductos.executeQuery();
+
+            if(rsProductos.next()) {
+                lblProductos.setText(rsProductos.getString("total"));
+            }
+            
+            // STOCK BAJO
+            String sqlStock = "SELECT COUNT(*) AS total FROM productos WHERE stock < 10";
+            PreparedStatement psStock = con.prepareStatement(sqlStock);
+            ResultSet rsStock = psStock.executeQuery();
+            
+            // CATEGORIAS
+            
+            String sqlCategorias = "SELECT COUNT(*) AS total FROM categorias";
+
+            PreparedStatement psCategorias = con.prepareStatement(sqlCategorias);
+
+            ResultSet rsCategorias = psCategorias.executeQuery();
+
+            if(rsCategorias.next()) {
+                lblCategorias.setText(rsCategorias.getString("total"));
+            }
+            // CARGAR PROVEEDORES
+            
+            String sqlProveedores = "SELECT COUNT(*) AS total FROM proveedores";
+
+            PreparedStatement psProveedores = con.prepareStatement(sqlProveedores);
+
+            ResultSet rsProveedores = psProveedores.executeQuery();
+
+            if(rsProveedores.next()) {
+                lblProveedores.setText(rsProveedores.getString("total"));
+            }
+            
+            ///////////
+            
+            if(rsStock.next()) {
+
+                int bajos = rsStock.getInt("total");
+
+                lblStock.setText(String.valueOf(bajos));
+
+                if(bajos > 0) {
+                    lblStock.getParent().setBackground(Color.RED);
+                } else {
+                    lblStock.getParent().setBackground(new Color(155,89,182));
+                }
+            }
+
+            // USUARIOS
+            String sqlUsuarios = "SELECT COUNT(*) AS total FROM usuarios";
+            PreparedStatement psUsuarios = con.prepareStatement(sqlUsuarios);
+            ResultSet rsUsuarios = psUsuarios.executeQuery();
+
+            if(rsUsuarios.next()) {
+                lblUsuarios.setText(rsUsuarios.getString("total"));
+            }
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+
+    //---------------- MÉTODO CREAR BOTÓN ----------------
+
+    private JButton crearBoton(String texto, int y) {
+
+        JButton boton = new JButton(texto);
+
+        boton.setBounds(25, y, 170, 45);
+
+        boton.setFocusPainted(false);
+
+        boton.setBackground(new Color(240,240,240));
+
+        boton.setFont(new Font("Arial", Font.BOLD, 14));
+
+        return boton;
+    }
+
+    //---------------- ABRIR PRODUCTOS ----------------
+
+    private void abrirProductos() {
+
+        ListaProductos ventana = new ListaProductos();
+
+        ventana.setVisible(true);
+    }
+
+    //---------------- ABRIR USUARIOS ----------------
+
+    private void abrirUsuarios() {
+
+        ListaUsuario ventana = new ListaUsuario();
+
+        ventana.setVisible(true);
+    }
+
+    //---------------- CERRAR SESIÓN ----------------
+
+    private void cerrarSesion() {
+
+        int opcion = JOptionPane.showConfirmDialog(
+                null,
+                "¿Cerrar sesión?"
+        );
+
+        if(opcion == 0) {
+
+            new Login();
+
+            dispose();
+        }
+    }
+    private JLabel crearCard(
+            String titulo,
+            String valor,
+            Color color
+    ) {
+
+        JPanel card = new JPanel();
+
+        card.setBackground(color);
+
+        card.setLayout(new BorderLayout());
+
+        card.setBorder(
+                BorderFactory.createEmptyBorder(
+                        15,
+                        15,
+                        15,
+                        15
+                )
+        );
+
+        JLabel lblTitulo = new JLabel(titulo);
+
+        lblTitulo.setForeground(Color.WHITE);
+
+        lblTitulo.setFont(
+                new Font("Arial", Font.BOLD, 18)
+        );
+
+        JLabel lblValor = new JLabel(valor);
+
+        lblValor.setForeground(Color.WHITE);
+
+        lblValor.setFont(
+                new Font("Arial", Font.BOLD, 30)
+        );
+
+        card.add(lblTitulo, BorderLayout.NORTH);
+
+        card.add(lblValor, BorderLayout.CENTER);
+
+        dashboard.add(card);
+        
+        return lblValor;
+        
+        
+    }
 }

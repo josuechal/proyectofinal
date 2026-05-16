@@ -158,8 +158,7 @@ public class ListaUsuario extends JFrame {
     }
     
     private void eliminarUsuario(int id) {
-
-        // Evitar borrar al admin principal
+    	
         if(id == 1) {
             JOptionPane.showMessageDialog(
                     null,
